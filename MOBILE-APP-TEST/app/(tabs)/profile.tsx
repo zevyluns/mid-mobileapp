@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { AuthContext } from "../src/context/AuthContext";
 
-export default function About() {
+export default function Profile() {
 
   const auth = useContext(AuthContext);
   const router = useRouter();
@@ -41,6 +41,9 @@ const styles = StyleSheet.create({
   },
 
   logoutButton:{
+    position: "absolute",
+    top: 20,
+    right: 20,
     backgroundColor:"#ff3b30",
     padding:12,
     borderRadius:8

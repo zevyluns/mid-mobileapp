@@ -24,7 +24,7 @@ const TabsLayout = () => {
       }}
     >
       <Tabs.Screen
-        name="about"
+        name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => (
@@ -34,7 +34,7 @@ const TabsLayout = () => {
       />
 
       <Tabs.Screen
-        name="background"
+        name="qrscan"
         options={{
           title: "QR SCAN",
           tabBarIcon: ({ color, size }) => (
@@ -44,7 +44,7 @@ const TabsLayout = () => {
       />
 
       <Tabs.Screen
-        name="experience"
+        name="menu"
         options={{
           title: "Today's Menu",
           tabBarIcon: ({ color, size }) => (

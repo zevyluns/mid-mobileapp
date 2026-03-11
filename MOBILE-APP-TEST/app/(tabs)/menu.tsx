@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const Experience = () => {
+const Menu = () => {
   return (
     <View style={styles.container}>
       {/*header*/}
@@ -24,4 +24,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Experience;
+export default Menu;

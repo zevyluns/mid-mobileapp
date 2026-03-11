@@ -16,7 +16,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 
-  const [users, setUsers] = useState<User[]>([{ username: "s22310344@student.unklab.ac.id", password: "12345" }
+  const [users, setUsers] = useState<User[]>([{ username: "exampleemail@student.school.com", password: "12345" }
 ]);
   const [user, setUser] = useState<User | null>(null);
 

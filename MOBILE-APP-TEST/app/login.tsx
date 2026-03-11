@@ -17,7 +17,7 @@ export default function Login() {
     const success = auth.login(username,password);
 
     if(success){
-      router.replace("/(tabs)/about");
+      router.replace("/(tabs)/profile");
     } else {
       alert("Invalid login");
     }

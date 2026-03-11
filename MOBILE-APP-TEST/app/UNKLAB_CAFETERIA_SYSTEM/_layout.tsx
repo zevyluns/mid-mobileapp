@@ -24,11 +24,11 @@ const TabsLayout = () => {
       }}
     >
       <Tabs.Screen
-        name="profile"
+        name="home"
         options={{
-          title: "Profile",
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
+            <Ionicons name="home-outline" size={size} color={color} />
           ),
         }}
       />

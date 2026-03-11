@@ -1,14 +1,17 @@
 import { Camera, CameraView } from "expo-camera";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, StyleSheet, Text, View } from "react-native";
-
+import { AuthContext } from "../src/context/AuthContext";
 
 const QRScan = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [scanning, setScanning] = useState(false);
 
-  // The expected QR code value
+  const [scannedUsers, setScannedUsers] = useState<string[]>([]);
+
+  const auth = useContext(AuthContext);
+
   const expectedCode = "12345678";
 
   useEffect(() => {
@@ -21,13 +24,32 @@ const QRScan = () => {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+
     setScanned(true);
     setScanning(false);
 
+    if (!auth?.user) {
+      Alert.alert("Error", "No logged in user.");
+      return;
+    }
+
+    const username = auth.user.username;
+
+    // check if user already scanned
+    if (scannedUsers.includes(username)) {
+      Alert.alert("Error", "Anda sudah melakukan scan sebelumnya.");
+      return;
+    }
+
     if (data === expectedCode) {
-      Alert.alert("Success", "Code scanned");
-    } else {
-      Alert.alert("Error", "Scan failed");
+
+      setScannedUsers([...scannedUsers, username]);
+
+      Alert.alert("Success", `Berhasil! Scan dicatat untuk ${auth.user.name}`);
+    } 
+    
+    else {
+      Alert.alert("Error", "Gagal: Kode tidak valid.");
     }
   };
 
@@ -37,8 +59,8 @@ const QRScan = () => {
   };
 
   const stopScanning = () => {
-  setScanning(false);
-};
+    setScanning(false);
+  };
 
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
@@ -49,22 +71,22 @@ const QRScan = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>QR Code Scanner</Text>
+      <Text style={styles.title}>SCAN ABSENSI DINING</Text>
 
       {!scanning ? (
-    <Button title="Start Scanning" onPress={startScanning} />
-  ) : (
-    <>
-      <CameraView
-        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
-        style={StyleSheet.absoluteFillObject}
-      />
-      <Button title="Stop Scanning" onPress={stopScanning} />
-    </>
-  )}
+        <Button title="Start Scanning" onPress={startScanning} />
+      ) : (
+        <>
+          <CameraView
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: ["qr"],
+            }}
+            style={StyleSheet.absoluteFillObject}
+          />
+          <Button title="Stop Scanning" onPress={stopScanning} />
+        </>
+      )}
 
       {scanned && (
         <Button title="Scan Again" onPress={startScanning} />

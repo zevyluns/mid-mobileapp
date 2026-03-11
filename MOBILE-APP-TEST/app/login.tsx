@@ -14,13 +14,21 @@ export default function Login() {
   if (!auth) return null;
 
   const handleLogin = () => {
-    const success = auth.login(username,password);
 
-    if(success){
-      router.replace("/(tabs)/profile");
-    } else {
-      alert("Invalid login");
+    const result = auth.login(username,password);
+
+    if(result === "success"){
+      router.replace("/UNKLAB_CAFETERIA_SYSTEM/home");
     }
+
+    else if(result === "blocked_status"){
+      alert("Your account is not allowed to login.");
+    }
+
+    else if(result === "invalid_credentials"){
+      alert("Username or password is incorrect.");
+    }
+
   };
 
   return (

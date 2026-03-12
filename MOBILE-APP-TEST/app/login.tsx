@@ -76,9 +76,7 @@ const styles = StyleSheet.create({
     padding:25,
     borderRadius:12,
     shadowColor:"#000",
-    shadowOpacity:0.1,
-    shadowRadius:10,
-    elevation:5
+    elevation:10
   },
 
   title:{

@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    gap: 16,
+    gap: 10,
   },
 
   title: {

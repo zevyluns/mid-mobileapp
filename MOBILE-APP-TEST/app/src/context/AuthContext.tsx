@@ -22,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [users, setUsers] = useState<User[]>([
     {
+      // status = 0 artinya asrama, status = 1 artinya outsider
       username: "exampleemail@student.school.com",
       password: "12345",
       status: 0,

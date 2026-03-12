@@ -4,12 +4,15 @@ import { Alert, Button, StyleSheet, Text, View } from "react-native";
 import { AuthContext } from "../src/context/AuthContext";
 
 const QRScan = () => {
+  // state menyimpan status izin kamera (boolean T/F atau null)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  // dipanggil untuk mencegah scan kedua kali, jika true maka scan berikutnya tidak akan diproses
   const [scanned, setScanned] = useState(false);
+  // state untuk mengontrol kamera aktif atau tidak, defaultnya false
   const [scanning, setScanning] = useState(false);
-
+  // menyimpan daftar username yang sudah scan
   const [scannedUsers, setScannedUsers] = useState<string[]>([]);
-
+  
   const auth = useContext(AuthContext);
 
   const expectedCode = "12345678";

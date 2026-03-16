@@ -1,26 +1,19 @@
-import { Redirect, Stack, useSegments } from "expo-router";
-import { useContext } from "react";
-import { AuthContext, AuthProvider } from "./src/context/AuthContext";
+import React from "react";
+import { Stack } from "expo-router";
+import { ConvexReactClient, ConvexProvider } from "convex/react";
+import { AuthProvider } from "./src/context/AuthContext";
 
-function RootLayout() {
-  const auth = useContext(AuthContext);
-  const segments = useSegments();
+const CONVEX_URL =
+  process.env.EXPO_PUBLIC_CONVEX_URL || "https://modest-mongoose-820.convex.cloud";
 
-  if (!auth) return null;
+const convexClient = new ConvexReactClient(CONVEX_URL);
 
-  const inAuthScreen = segments[0] === "login" ;
-
-  if (!auth.user && !inAuthScreen) {
-    return <Redirect href="/login" />;
-  }
-
-  return <Stack />;
-}
-
-export default function Layout() {
+export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootLayout />
-    </AuthProvider>
+    <ConvexProvider client={convexClient}>
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </AuthProvider>
+    </ConvexProvider>
   );
 }

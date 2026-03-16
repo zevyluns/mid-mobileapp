@@ -1,115 +1,89 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, View, Text, StyleSheet } from "react-native";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
-const weeklyMenu = [
-  {
-    day: "SUNDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  },
-  {
-    day: "MONDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  },
-  {
-    day: "TUESDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  },
-  {
-    day: "WEDNESDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  },
-  {
-    day: "THURSDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  },
-  {
-    day: "FRIDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  },
-  {
-    day: "SATURDAY",
-    morning: "Template",
-    afternoon: "Template",
-    evening: "Template"
-  }
-];
+export default function MenuScreen() {
+  const menus = useQuery(api.menu.getAll.getAll) ?? [];
 
-const Menu = () => {
-  // get hari dari device
-  const todayIndex = new Date().getDay(); // return dengan 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  // ambil data hari dari hp
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Weekly Menu</Text>
-      <ScrollView>
-      {weeklyMenu.map((menu, index) => {
-        const isToday = index === todayIndex;
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>Weekly Menu</Text>
+
+      {menus.map((m: any) => {
+        const isToday = m.day.toLowerCase() === today.toLowerCase();
 
         return (
           <View
-            key={menu.day}
-            style={[
-              styles.menuBox,
-              index === todayIndex && styles.highlightBox
-            ]}
+            key={m.id} // highlight card jika isToday = true
+            style={[styles.card, isToday && styles.todayCard]}
           >
-            <Text style={styles.dayTitle}>{menu.day} MENU</Text>
-            <Text>Morning: {menu.morning}</Text>
-            <Text>Afternoon: {menu.afternoon}</Text>
-            <Text>Evening: {menu.evening}</Text>
+            <Text style={[styles.day, isToday && styles.todayText]}>
+              {m.day}
+            </Text>
+
+            <Text style={styles.menuText}>{m.text}</Text>
+
+            {isToday && <Text style={styles.todayBadge}>TODAY</Text>}
           </View>
         );
       })}
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
-};
+}
 
-// styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    gap: 10,
-  },
-
-  title: {
-    alignSelf: "center",
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 10,
-  },
-
-  menuBox: {
-    borderWidth: 2,
-    borderColor: "#333",
-    borderRadius: 10,
     padding: 16,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f5f6fa",
   },
 
-  highlightBox: {
-    borderColor: "#007AFF",
-    backgroundColor: "#dfefff",
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
 
-  dayTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 18,
+    marginBottom: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+
+  todayCard: {
+    borderWidth: 2,
+    borderColor: "#4CAF50",
+    backgroundColor: "#f0fff4",
+  },
+
+  day: {
+    fontSize: 20,
+    fontWeight: "bold",
     marginBottom: 6,
   },
-});
 
-export default Menu;
+  todayText: {
+    color: "#2e7d32",
+  },
+
+  menuText: {
+    fontSize: 18,
+    lineHeight: 24,
+  },
+
+  todayBadge: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#2e7d32",
+  },
+});

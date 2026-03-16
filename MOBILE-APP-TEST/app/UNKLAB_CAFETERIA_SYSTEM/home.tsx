@@ -1,68 +1,30 @@
-import { useRouter } from "expo-router";
-import { useContext } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { AuthContext } from "../src/context/AuthContext";
+import React from "react";
+import { View, Text, Button, StyleSheet } from "react-native";
+import { useAuth } from "../src/context/AuthContext";
+import { router } from "expo-router";
 
-export default function Home() {
-
-  const auth = useContext(AuthContext);
-  const router = useRouter();
-
-  if (!auth) return null;
+export default function HomeScreen() {
+  const { user, signOut } = useAuth();
 
   const handleLogout = () => {
-    auth.logout();
+    signOut();              // fungsi sign out dari context
+    router.replace("/login"); 
   };
-
-  const name = auth.user?.name ?? "Guest";
 
   return (
     <View style={styles.container}>
-
       <Text style={styles.title}>Home</Text>
-
-      <Text style={styles.welcome}>
-        Welcome, {name}
+      <Text style={styles.text}>
+        Welcome, {user?.name ?? user?.email ?? "Guest"}!
       </Text>
 
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </Pressable>
-
+      <Button title="Log out" onPress={handleLogout} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container:{
-    flex:1,
-    justifyContent:"center",
-    alignItems:"center"
-  },
-
-  title:{
-    fontSize:22,
-    marginBottom:10
-  },
-
-  welcome:{
-    fontSize:18,
-    marginBottom:20
-  },
-
-  logoutButton:{
-    position: "absolute",
-    top: 20,
-    right: 20,
-    backgroundColor:"#ff3b30",
-    padding:12,
-    borderRadius:8
-  },
-
-  logoutText:{
-    color:"white",
-    fontWeight:"bold"
-  }
-
+  container: { padding: 20, flex: 1, justifyContent: "center" },
+  title: { fontSize: 22, marginBottom: 12 },
+  text: { fontSize: 18, marginBottom: 20 },
 });

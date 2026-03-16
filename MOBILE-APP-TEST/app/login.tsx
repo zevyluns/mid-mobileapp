@@ -1,118 +1,88 @@
-import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { AuthContext } from "./src/context/AuthContext";
+import React, { useState } from "react";
+import { View, TextInput, Button, Text, StyleSheet, Alert } from "react-native";
+import { useAuth } from "./src/context/AuthContext";
+import { router } from "expo-router";
 
-export default function Login() {
+export default function LoginScreen() {
+  const { signIn } = useAuth();
 
-  const auth = useContext(AuthContext);
-  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const [username,setUsername] = useState("");
-  const [password,setPassword] = useState("");
+  const onLogin = async () => {
+    setErr(null);
+    setLoading(true);
 
-  if (!auth) return null;
+    const result = await signIn(email, password);
 
-  const handleLogin = () => {
+    setLoading(false);
 
-    const result = auth.login(username,password);
-
-    if(result === "success"){
-      router.replace("/UNKLAB_CAFETERIA_SYSTEM/home");
+    if (!result.ok) {
+      if (result.error === "INVALID_CREDENTIALS") {
+        setErr("Wrong email or password.");
+      } else if (result.error === "NOT_ALLOWED_STATUS") {
+        setErr("Your account is not allowed to log in.");
+      } else {
+        setErr("Login failed: " + result.error);
+      }
+      return;
     }
 
-    else if(result === "blocked_status"){
-      alert("Your account is not allowed to login.");
-    }
-
-    else if(result === "invalid_credentials"){
-      alert("Username or password is incorrect.");
-    }
-
+    // route ke home jika login berhasil
+    router.replace("/UNKLAB_CAFETERIA_SYSTEM/home");
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>UNKLAB CAFETERIA SYSTEM</Text>
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        style={styles.input}
+        autoCapitalize="none"
+      />
 
-      <View style={styles.card}>
+      <TextInput
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        style={styles.input}
+      />
 
-        <Text style={styles.title}>UNKLAB CAFETERIA SYSTEM</Text>
+      {err ? <Text style={styles.error}>{err}</Text> : null}
 
-        <TextInput
-          placeholder="Unklab Email"
-          style={styles.input}
-          onChangeText={setUsername}
-        />
-
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setPassword}
-        />
-
-        <Pressable style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </Pressable>
-
-      </View>
-
+      <Button
+        title={loading ? "Signing in..." : "Sign In"}
+        onPress={onLogin}
+        disabled={loading}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container:{
-    flex:1,
-    justifyContent:"center",
-    alignItems:"center",
-    backgroundColor:"#f2f2f2"
+  container: {
+    padding: 20,
+    flex: 1,
+    justifyContent: "center",
   },
-
-  card:{
-    width:"85%",
-    backgroundColor:"white",
-    padding:25,
-    borderRadius:12,
-    shadowColor:"#000",
-    elevation:10
+  title: {
+    fontSize: 22,
+    marginBottom: 20,
+    textAlign: "center",
+    fontWeight: 700,
   },
-
-  title:{
-    fontSize:28,
-    fontWeight:"bold",
-    marginBottom:20,
-    textAlign:"center"
+  input: {
+    borderBottomWidth: 1,
+    marginBottom: 12,
+    padding: 8,
   },
-
-  input:{
-    borderWidth:1,
-    borderColor:"#ddd",
-    borderRadius:8,
-    padding:12,
-    marginBottom:15,
-    fontSize:16
+  error: {
+    color: "red",
+    marginBottom: 12,
   },
-
-  button:{
-    backgroundColor:"#007AFF",
-    padding:14,
-    borderRadius:8,
-    alignItems:"center",
-    marginTop:5
-  },
-
-  buttonText:{
-    color:"white",
-    fontSize:16,
-    fontWeight:"600"
-  },
-
-  link:{
-    marginTop:15,
-    color:"#007AFF",
-    textAlign:"center"
-  }
-
 });

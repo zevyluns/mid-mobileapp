@@ -1,80 +1,64 @@
-import React, { createContext, ReactNode, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
 
 type User = {
-  username: string;
-  password: string;
-  status: number;
+  id: Id<"users">;
+  email: string;
   name: string;
+  scanned?: boolean;
 };
-
-type LoginResult = "success" | "invalid_credentials" | "blocked_status";
 
 type AuthContextType = {
   user: User | null;
-  login: (username: string, password: string) => LoginResult;
-  register: (username: string, password: string) => boolean;
-  logout: () => void;
+  signIn: (email: string, password: string) => Promise<{
+    ok: boolean;
+    error?: string;
+  }>;
+  signOut: () => void;
 };
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  signIn: async () => ({ ok: false }),
+  signOut: () => {},
+});
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-
-  const [users, setUsers] = useState<User[]>([
-    {
-      // status = 0 artinya asrama, status = 1 artinya outsider
-      username: "exampleemail@student.school.com",
-      password: "12345",
-      status: 0,
-      name: "Placeholder1"
-    },
-    {
-      username: "exampleemail2@student.school.com",
-      password: "12345",
-      status: 1,
-      name: "Placeholder2"
-    }
-  ]);
-
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const register = (username: string, password: string) => {
+  const verifyCredentials = useMutation(api.auth.verifyCredentials.verifyCredentials);
 
-    const exists = users.find(u => u.username === username);
-    if (exists) return false;
+  const signIn = async (email: string, password: string) => {
+    try {
+      const res = await verifyCredentials({ email, password });
 
-    setUsers([
-      ...users,
-      {
-        username,
-        password,
-        status: 0, // default status
-        name: "New User"
-      }
-    ]);
+      setUser({
+        id: res.id,
+        email: res.email,
+        name: res.name,
+        scanned: res.scanned,
+      });
 
-    return true;
+      return { ok: true };
+    } catch (err: any) {
+      return {
+        ok: false,
+        error: err.message ?? "Login failed",
+      };
+    }
   };
 
-  const login = (username: string, password: string): LoginResult => {
-
-    const found = users.find(
-      u => u.username === username && u.password === password
-    );
-
-    if (!found) return "invalid_credentials";
-
-    if (found.status === 1) return "blocked_status";
-
-    setUser(found);
-    return "success";
+  const signOut = () => {
+    setUser(null);
   };
-
-  const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
+
+export const useAuth = () => useContext(AuthContext);
